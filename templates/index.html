@@ -4,11 +4,16 @@
   <title>TouchDesigner Stream</title>
   <style>
     body {
-      
-      color:#fff;
-      text-align:center;
-      font-family:sans-serif;
-      overflow-x:hidden;
+        background: #ffffff;
+        color: #fff;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* 세로 중앙 */
+        align-items: center;     /* 가로 중앙 */
+        font-family: sans-serif;
+        overflow-x:hidden;
     }
   
     .controls {
@@ -23,12 +28,11 @@
     button {
       margin:5px;
       padding:5px 10px;
-      font-size:16px;
+      font-size:12px;
       cursor:pointer;
       background:#222;
       color:#fff;
-      border:1px solid #555;
-      border-radius:8px;
+      
     }
   
     button:hover {
@@ -36,8 +40,7 @@
     }
   
     img {
-      width:100%;
-    
+      width:110%;
       
     }
   </style>
@@ -53,15 +56,48 @@
     <img id="stream" src="/stream" alt="stream not available">
   
     
-  <script>
-    function sendShape(num){
-      fetch('/send', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({shape:num})
-      }).then(r=>r.json()).then(d=>console.log('sent shape', num));
-    }
-  </script>
+    <script>
+        // 미리 로드
+        const sounds = {
+          1: new Audio('/static/sound1.mp3'),
+          2: new Audio('/static/sound2.mp3'),
+          3: new Audio('/static/sound3.mp3')
+        };
+      
+        let currentSound = null; // 현재 재생 중인 사운드 저장
+      
+        function playSound(num) {
+          // 이전 노래 정지
+          if (currentSound && !currentSound.paused) {
+            currentSound.pause();
+            currentSound.currentTime = 0;
+          }
+      
+          // 새로운 노래 재생
+          const newSound = sounds[num];
+          if (newSound) {
+            newSound.currentTime = 0;
+            newSound.play().catch(e => console.warn(e));
+            currentSound = newSound;
+          }
+        }
+      
+        function sendShape(num){
+          fetch('/send', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({shape:num})
+          })
+          .then(r => r.json())
+          .then(d => console.log('sent shape', num));
+      
+          playSound(num);
+        }
+      </script>
+      
+      
+      
+      
   </body>
   
 </html>
