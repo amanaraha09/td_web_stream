@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TouchDesigner Stream</title>
+  <style>
+    body { background:#000; color:#fff; text-align:center; font-family:sans-serif; }
+    button { margin:10px; padding:10px 20px; font-size:16px; cursor:pointer; }
+    img { width:80vw; border:2px solid #444; margin-top:20px; }
+  </style>
+</head>
+<body>
+  <h1>TouchDesigner Live Stream</h1>
+  <div>
+    <button onclick="sendShape(1)">Shape 1</button>
+    <button onclick="sendShape(2)">Shape 2</button>
+    <button onclick="sendShape(3)">Shape 3</button>
+  </div>
+  <img id="stream" src="/stream" alt="stream not available">
+  <script>
+    function sendShape(num){
+      fetch('/send', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({shape:num})
+      }).then(r=>r.json()).then(d=>console.log('sent shape', num));
+    }
+  </script>
+</body>
+</html>
