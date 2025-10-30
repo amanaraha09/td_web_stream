@@ -3,19 +3,56 @@
 <head>
   <title>TouchDesigner Stream</title>
   <style>
-    body { background:#000; color:#fff; text-align:center; font-family:sans-serif; }
-    button { margin:10px; padding:10px 20px; font-size:16px; cursor:pointer; }
-    img { width:80vw; border:2px solid #444; margin-top:20px; }
+    body {
+      
+      color:#fff;
+      text-align:center;
+      font-family:sans-serif;
+      overflow-x:hidden;
+    }
+  
+    .controls {
+      position:absolute;       /* 화면 위에 고정 */
+      top:5px;             /* 위쪽 여백 */
+      left:50%;
+      transform:translateX(-50%);
+      z-index:1000;         /* 이미지보다 위로 */
+      
+    }
+  
+    button {
+      margin:5px;
+      padding:5px 10px;
+      font-size:16px;
+      cursor:pointer;
+      background:#222;
+      color:#fff;
+      border:1px solid #555;
+      border-radius:8px;
+    }
+  
+    button:hover {
+      background:#444;
+    }
+  
+    img {
+      width:100%;
+    
+      
+    }
   </style>
+  
 </head>
 <body>
-  <h1>TouchDesigner Live Stream</h1>
-  <div>
-    <button onclick="sendShape(1)">Shape 1</button>
-    <button onclick="sendShape(2)">Shape 2</button>
-    <button onclick="sendShape(3)">Shape 3</button>
-  </div>
-  <img id="stream" src="/stream" alt="stream not available">
+    <div class="controls">
+      <button onclick="sendShape(1)">Shape 1</button>
+      <button onclick="sendShape(2)">Shape 2</button>
+      <button onclick="sendShape(3)">Shape 3</button>
+    </div>
+  
+    <img id="stream" src="/stream" alt="stream not available">
+  
+    
   <script>
     function sendShape(num){
       fetch('/send', {
@@ -25,5 +62,6 @@
       }).then(r=>r.json()).then(d=>console.log('sent shape', num));
     }
   </script>
-</body>
+  </body>
+  
 </html>

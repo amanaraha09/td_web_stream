@@ -2,10 +2,11 @@ from flask import Flask, Response, request, render_template
 from flask_cors import CORS
 import os, time, threading, requests
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 CORS(app)
 
 latest_frame = None
+last_good_frame = None
 TD_URL = "http://127.0.0.1:9980"
 
 @app.route("/upload", methods=["POST"])
@@ -17,16 +18,22 @@ def upload():
     return "ok"
 
 def generate():
-    last_sent = 0
+    global last_good_frame
     while True:
         if latest_frame and os.path.exists(latest_frame):
-            if time.time() - last_sent > 0.05:
+            try:
                 with open(latest_frame, "rb") as f:
                     frame = f.read()
-                yield b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + frame + b"\r\n"
-                last_sent = time.time()
-        else:
-            time.sleep(0.05)
+                if len(frame) > 1000:  # 너무 작은 파일은 무시
+                    last_good_frame = frame
+                if last_good_frame:
+                    yield (
+                        b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                        + last_good_frame + b"\r\n"
+                    )
+            except Exception as e:
+                print("⚠️ frame read error:", e)
+        time.sleep(0.05)
 
 @app.route("/stream")
 def stream():
@@ -48,7 +55,7 @@ def receive_shape():
 
 @app.route("/")
 def index():
-    return render_template("index.html")   # ← HTML 파일 불러오기
+    return render_template("index.html")
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5050, threaded=True)
